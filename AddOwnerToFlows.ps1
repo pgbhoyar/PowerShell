@@ -41,9 +41,11 @@ $emailAddress = "demo@pgbhoyar.onmicrosoft.com";
 Add-PowerAppsAccount 
 Connect-AzureAD
 
-$flowEnvironments = Get-FlowEnvironment
+## This will give you default environment in case you have multiple environments. To get non-default environment use the string from DisplayName of the environment. 
+## If you don't know the environment displayName, Type cmdlet Get-FlowEnvironment to get the information of all the available environments
+$flowEnvironment = Get-FlowEnvironment *default*
 
-Write-Host "Flow Environment ID is " $flowEnvironments[0].EnvironmentName
+Write-Host "Flow Environment ID is " $flowEnvironment.EnvironmentName
 $userID = Get-AzureADUser -ObjectID $emailAddress | Select-Object ObjectId
 
 Write-Host "UserID is " $userID.objectId
@@ -57,11 +59,7 @@ foreach($flow in $flows){
         ## Sample cmdlet
         #Set-AdminFlowOwnerRole -PrincipalType Group -PrincipalObjectId <Guid> -RoleName CanEdit -FlowName <Guid> -EnvironmentName Default-<Guid>
         
-        ## If you have single environment
-        #Set-AdminFlowOwnerRole -PrincipalType User -PrincipalObjectId $userID.objectId -RoleName CanEdit -FlowName $flow.FlowName -EnvironmentName $flowEnvironments.EnvironmentName
-        
-        ## If you have multiple environments
-        Set-AdminFlowOwnerRole -PrincipalType User -PrincipalObjectId $userID.objectId -RoleName CanEdit -FlowName $flow.FlowName -EnvironmentName $flowEnvironments[0].EnvironmentName
+        Set-AdminFlowOwnerRole -PrincipalType User -PrincipalObjectId $userID.objectId -RoleName CanEdit -FlowName $flow.FlowName -EnvironmentName $flowEnvironment.EnvironmentName
         
         Write-Host "Added Owner" $emailAddress " to the Flow " $flow.DisplayName
         }
